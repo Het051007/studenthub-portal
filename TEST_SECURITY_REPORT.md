@@ -116,7 +116,7 @@ The interface was constructed and audited following the **W3C Web Content Access
 
 ## 5. EMPIRICAL SCREENSHOT EVIDENCE & SUBMISSION PROOFS
 
-For final practical submission documentation, capture the following 9 visual proofs either from the live server or directly using [`standalone_studenthub_demo.html`](file:///C:/Users/hetpa/.gemini/antigravity/scratch/studenthub/standalone_studenthub_demo.html):
+For practical documentation and verification, the following 9 visual scenarios can be observed directly on the server or via [`standalone_studenthub_demo.html`](standalone_studenthub_demo.html):
 
 | Proof # | Scenario Name | Visual Evidence Description | Key Observed Indicators |
 |:---:|---|---|---|

@@ -68,7 +68,7 @@ require_once __DIR__ . '/includes/header.php';
         <!-- Quick Autofill Testing Bar -->
         <div style="background: #0f172a; padding: 12px; border-radius: var(--radius-sm); margin-bottom: 20px; border: 1px dashed var(--border);">
             <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; text-align: center;">
-                ⚡ Fast-Test Autofill (Lab Evaluation)
+                🔑 Quick Sign-In (Demo Credentials)
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                 <button type="button" class="btn btn-outline btn-sm" onclick="fillCredentials('student')" aria-label="Autofill Student Credentials">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudentHub Portal - Interactive Evaluation Simulator & Screenshot Proofs</title>
+    <title>StudentHub Portal - Interactive UI Prototype & Scenario Verification</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -282,27 +282,27 @@
 </head>
 <body>
 
-    <!-- 1. Simulator Evaluator Control Bar -->
-    <aside class="eval-toolbar" aria-label="Simulator Controls">
+    <!-- 1. Prototype Navigation Toolbar -->
+    <aside class="eval-toolbar" aria-label="Prototype Navigation">
         <div class="eval-toolbar-inner">
             <div class="eval-title">
-                <span>🎓 <strong>StudentHub Simulator</strong></span>
+                <span>🎓 <strong>StudentHub Prototype</strong></span>
                 <span style="font-size:0.75rem; color:#94a3b8;">CHARUSAT 25CS062</span>
             </div>
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                <label for="scenarioSelect" style="font-size:0.8rem; color:#cbd5e1; font-weight:600;">Evaluation Scenario:</label>
-                <select id="scenarioSelect" class="eval-selector" onchange="switchView(this.value)" aria-label="Select Submission Scenario">
-                    <option value="view-landing">Screenshot 1: Portal Landing Page (index.php)</option>
-                    <option value="view-login" selected>Screenshot 2: Student Login (login.php)</option>
-                    <option value="view-student">Screenshot 3: Student Academic Dashboard</option>
-                    <option value="view-admin">Screenshot 4: Admin Management Console</option>
-                    <option value="view-rbac-block">Screenshot 5: RBAC 403 Forbidden Intercept</option>
-                    <option value="view-fixation">Screenshot 6: Session Fixation Defense Proof</option>
-                    <option value="view-timeout">Screenshot 7: Inactivity Timeout Alert</option>
-                    <option value="view-register">Screenshot 8: Student Registration Form</option>
-                    <option value="view-audit">Screenshot 9: Security Audit Log Table</option>
+                <label for="scenarioSelect" style="font-size:0.8rem; color:#cbd5e1; font-weight:600;">Portal Scenario:</label>
+                <select id="scenarioSelect" class="eval-selector" onchange="switchView(this.value)" aria-label="Select Scenario">
+                    <option value="view-landing">Scenario 1: Portal Landing Page (index.php)</option>
+                    <option value="view-login" selected>Scenario 2: Student Login (login.php)</option>
+                    <option value="view-student">Scenario 3: Student Academic Dashboard</option>
+                    <option value="view-admin">Scenario 4: Admin Management Console</option>
+                    <option value="view-rbac-block">Scenario 5: RBAC 403 Forbidden Intercept</option>
+                    <option value="view-fixation">Scenario 6: Session Fixation Defense Proof</option>
+                    <option value="view-timeout">Scenario 7: Inactivity Timeout Alert</option>
+                    <option value="view-register">Scenario 8: Student Registration Form</option>
+                    <option value="view-audit">Scenario 9: Security Audit Log Table</option>
                 </select>
-                <button class="btn-shot-guide" onclick="openGuideModal()">📸 Screenshot Guide</button>
+                <button class="btn-shot-guide" onclick="openGuideModal()">📌 Scenario Guide</button>
             </div>
         </div>
     </aside>
@@ -544,10 +544,10 @@
                         </div>
                         <div class="notice-item important">
                             <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                                <strong style="font-size:0.9rem;">Teams Submission Window Active</strong>
+                                <strong style="font-size:0.9rem;">Academic Registration Window</strong>
                                 <span class="badge badge-warning">Important</span>
                             </div>
-                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:4px;">Upload GitHub link, studenthub.sql dump, README and security checklist.</p>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:4px;">All B.Tech CSE Semester 3 students must verify enrolled course lists and continuous evaluation records.</p>
                             <small style="color:var(--text-muted); font-size:0.7rem;">Published by Admin Console</small>
                         </div>
                     </div>

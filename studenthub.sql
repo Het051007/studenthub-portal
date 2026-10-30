@@ -150,7 +150,7 @@ INSERT INTO enrollments (enrollment_id, user_id, course_id, semester, grade, att
 -- 4. Institutional Notices
 INSERT INTO notices (notice_id, author_id, title, content, priority, target_role) VALUES
 (1, 1, 'Final Practical Exam Schedule - Semester 3', 'The practical exam for Web Development Framework (CE251) will be conducted in Lab 304. Ensure your repository is committed and SQL dump is verified.', 'Urgent', 'All'),
-(2, 1, 'Microsoft Teams Submission Window Active', 'Upload your integrated practical submission file including GitHub Repo link, SQL dump, README, and security checklist before the deadline.', 'Important', 'Student'),
+(2, 1, 'Academic Registration & Continuous Evaluation Window', 'All B.Tech CSE Semester 3 students are required to verify their enrolled course lists and continuous evaluation attendance records before the deadline.', 'Important', 'Student'),
 (3, 1, 'Campus Cyber Security Best Practices', 'All students and staff must ensure 2FA is activated and avoid sharing session cookies or leaving workstations unattended.', 'Normal', 'All');
 
 -- 5. Audit Logs

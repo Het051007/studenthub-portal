@@ -37,7 +37,7 @@ try {
             <a href="register.php" class="btn btn-outline" style="padding: 12px 28px; font-size: 1rem;">New Student Registration</a>
         <?php endif; ?>
         <a href="standalone_studenthub_demo.html" target="_blank" class="btn btn-outline" style="border-color: #38bdf8; color: #38bdf8;">
-            ⚡ Launch Zero-Server Interactive Simulator
+            💻 UI Prototype Preview
         </a>
     </div>
 </div>
@@ -96,22 +96,22 @@ try {
         <?php endif; ?>
     </div>
 
-    <!-- Quick Submission Reference Card -->
+    <!-- Portal Details Card -->
     <div class="card" style="border-top: 4px solid var(--primary);">
         <div class="card-header">
-            <h3 class="card-title" style="font-size: 1.1rem;">📋 Submission Checklist</h3>
+            <h3 class="card-title" style="font-size: 1.1rem;">🎓 Academic Portal Info</h3>
         </div>
         <ul style="list-style: none; font-size: 0.9rem; line-height: 1.8; color: var(--text-secondary);">
-            <li>✅ <strong>Integrated Codebase:</strong> PHP + PDO + MySQL</li>
-            <li>✅ <strong>Database Dump:</strong> <code>studenthub.sql</code></li>
-            <li>✅ <strong>Setup Guide:</strong> <code>README.md</code></li>
-            <li>✅ <strong>Audit & Accessibility:</strong> <code>TEST_SECURITY_REPORT.md</code></li>
-            <li>✅ <strong>Interactive Demo:</strong> <code>standalone_studenthub_demo.html</code></li>
+            <li>🔹 <strong>Backend Engine:</strong> PHP 8 + PDO (MySQL)</li>
+            <li>🔹 <strong>Database Schema:</strong> Relational (InnoDB)</li>
+            <li>🔹 <strong>Security Level:</strong> OWASP Top 10 Hardened</li>
+            <li>🔹 <strong>Access Control:</strong> Strict Role-Based (RBAC)</li>
+            <li>🔹 <strong>Accessibility:</strong> WCAG 2.1 Level AA</li>
         </ul>
         <div style="margin-top: 20px; padding: 12px; background: #0f172a; border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--text-muted);">
-            <strong>Student:</strong> Patel Het Nitinkumar<br>
+            <strong>Developer:</strong> Patel Het Nitinkumar<br>
             <strong>ID:</strong> 25CS062 | <strong>Sem:</strong> 3 (CSE)<br>
-            <strong>Course:</strong> Web Dev Framework
+            <strong>Subject:</strong> Web Development Framework
         </div>
     </div>
 </div>
