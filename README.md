@@ -42,12 +42,12 @@ git status
 # (e.g., https://github.com/hetpatel-25cs062/studenthub-portal.git)
 
 # 4. Connect remote repository and push
-git remote add origin https://github.com/hetpatel-25cs062/studenthub-portal.git
+git remote add origin https://github.com/Het051007/studenthub-portal.git
 git branch -M main
 git push -u origin main
 ```
 
-**Submitted Repo URL Format:** `https://github.com/hetpatel-25cs062/studenthub-portal`
+**Submitted Repo URL:** `https://github.com/Het051007/studenthub-portal`
 
 ---
 
