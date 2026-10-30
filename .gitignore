@@ -1,0 +1,8 @@
+# StudentHub Portal - Git Ignore Configuration
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+.vscode/
+.idea/
+vendor/

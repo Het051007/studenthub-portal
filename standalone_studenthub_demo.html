@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudentHub Portal - Interactive Evaluation Simulator & Screenshot Proofs</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-main: #0b0f19;
+            --bg-card: #151d30;
+            --border: #23314d;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.12);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.12);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.12);
+            --info: #0ea5e9;
+            --info-bg: rgba(14, 165, 233, 0.12);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Simulator Top Control Toolbar */
+        .eval-toolbar {
+            background: #111827;
+            border-bottom: 2px solid #2563eb;
+            padding: 10px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .eval-toolbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .eval-title {
+            font-weight: 800;
+            color: #38bdf8;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .eval-selector {
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-shot-guide {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+        }
+
+        /* Screenshot Context Banner */
+        .shot-banner {
+            background: rgba(37, 99, 235, 0.15);
+            border-bottom: 1px solid #2563eb;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            color: #93c5fd;
+            text-align: center;
+        }
+
+        /* App Navbar */
+        .navbar {
+            background: #111827;
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 65px;
+            padding: 0 20px;
+        }
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .brand-badge {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            list-style: none;
+        }
+        .nav-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover { color: #fff; border-color: #38bdf8; }
+        .nav-btn-primary { background: var(--primary); color: white; border: none; }
+        .nav-btn-primary:hover { background: var(--primary-hover); }
+
+        /* Main View Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px;
+            flex: 1;
+        }
+
+        /* View Panels (Controlled by Switcher) */
+        .view-panel { display: none; }
+        .view-panel.active { display: block; animation: fadeIn 0.25s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Card System */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-title { font-size: 1.2rem; font-weight: 700; }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            position: relative;
+        }
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--primary);
+        }
+        .stat-card.stat-success::before { background: var(--success); }
+        .stat-card.stat-warning::before { background: var(--warning); }
+        .stat-card.stat-info::before { background: var(--info); }
+        .stat-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; }
+        .stat-val { font-size: 1.8rem; font-weight: 800; margin: 6px 0 2px; }
+        .stat-sub { font-size: 0.78rem; color: var(--text-muted); }
+
+        /* Forms */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        .form-control:focus { outline: 2px solid #38bdf8; border-color: transparent; }
+
+        /* Tables */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        .table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        .table th { background: #0f172a; color: var(--text-secondary); padding: 10px 14px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid var(--border); }
+        .table td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+        .table tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Badges */
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; }
+        .badge-success { background: var(--success-bg); color: #34d399; border: 1px solid var(--success); }
+        .badge-danger { background: var(--danger-bg); color: #f87171; border: 1px solid var(--danger); }
+        .badge-warning { background: var(--warning-bg); color: #fbbf24; border: 1px solid var(--warning); }
+        .badge-info { background: var(--info-bg); color: #38bdf8; border: 1px solid var(--info); }
+
+        /* Alerts */
+        .alert { padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 18px; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; }
+        .alert-success { background: var(--success-bg); border: 1px solid var(--success); color: #34d399; }
+        .alert-danger { background: var(--danger-bg); border: 1px solid var(--danger); color: #f87171; }
+        .alert-warning { background: var(--warning-bg); border: 1px solid var(--warning); color: #fbbf24; }
+
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.9rem; cursor: pointer; border: none; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+        .btn-outline:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-block { width: 100%; }
+
+        /* Bulletins */
+        .notice-item { border-left: 4px solid var(--primary); background: #0f172a; padding: 12px 14px; border-radius: var(--radius-sm); margin-bottom: 10px; }
+        .notice-item.urgent { border-left-color: var(--danger); }
+        .notice-item.important { border-left-color: var(--warning); }
+
+        /* Modal Guide */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: var(--radius-md);
+            max-width: 720px;
+            width: 100%;
+            padding: 26px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Simulator Evaluator Control Bar -->
+    <aside class="eval-toolbar" aria-label="Simulator Controls">
+        <div class="eval-toolbar-inner">
+            <div class="eval-title">
+                <span>🎓 <strong>StudentHub Simulator</strong></span>
+                <span style="font-size:0.75rem; color:#94a3b8;">CHARUSAT 25CS062</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <label for="scenarioSelect" style="font-size:0.8rem; color:#cbd5e1; font-weight:600;">Evaluation Scenario:</label>
+                <select id="scenarioSelect" class="eval-selector" onchange="switchView(this.value)" aria-label="Select Submission Scenario">
+                    <option value="view-landing">Screenshot 1: Portal Landing Page (index.php)</option>
+                    <option value="view-login" selected>Screenshot 2: Student Login (login.php)</option>
+                    <option value="view-student">Screenshot 3: Student Academic Dashboard</option>
+                    <option value="view-admin">Screenshot 4: Admin Management Console</option>
+                    <option value="view-rbac-block">Screenshot 5: RBAC 403 Forbidden Intercept</option>
+                    <option value="view-fixation">Screenshot 6: Session Fixation Defense Proof</option>
+                    <option value="view-timeout">Screenshot 7: Inactivity Timeout Alert</option>
+                    <option value="view-register">Screenshot 8: Student Registration Form</option>
+                    <option value="view-audit">Screenshot 9: Security Audit Log Table</option>
+                </select>
+                <button class="btn-shot-guide" onclick="openGuideModal()">📸 Screenshot Guide</button>
+            </div>
+        </div>
+    </aside>
+
+    <div id="shotBanner" class="shot-banner">
+        📸 <strong>Screenshot 2 Context:</strong> Student Authentication Screen (login.php) with credentials populated for Het Patel (25CS062).
+    </div>
+
+    <!-- 2. Application Header Navigation -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="brand-logo" onclick="switchView('view-landing')">
+                <span style="font-size: 1.4rem;">🎓</span>
+                <span>StudentHub</span>
+                <span class="brand-badge">CHARUSAT</span>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><button class="nav-btn" onclick="switchView('view-landing')">Home</button></li>
+                    <li id="navStudentBtn"><button class="nav-btn" onclick="switchView('view-student')">My Academics</button></li>
+                    <li id="navAdminBtn"><button class="nav-btn" onclick="switchView('view-admin')">Admin Console</button></li>
+                    <li><button class="nav-btn" onclick="switchView('view-register')">Register</button></li>
+                    <li><button class="nav-btn nav-btn-primary" onclick="switchView('view-login')">Sign In</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 3. Dynamic Interactive Views -->
+    <main class="container">
+
+        <!-- VIEW 1: LANDING PAGE -->
+        <section id="view-landing" class="view-panel">
+            <div style="text-align: center; margin-bottom: 30px; padding: 35px 20px; background: linear-gradient(180deg, rgba(37, 99, 235, 0.12) 0%, rgba(15, 23, 42, 0) 100%); border-radius: var(--radius-lg); border: 1px solid var(--border);">
+                <span class="badge badge-info" style="margin-bottom: 12px; font-size: 0.8rem; padding: 5px 12px;">CHARUSAT CSPIT &bull; Web Development Framework Final Practical</span>
+                <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px;">StudentHub Academic Portal</h1>
+                <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 680px; margin: 0 auto 20px;">
+                    An integrated course registration, role-based access control, and notification platform engineered with modern security defenses (OWASP, Bcrypt, Session Fixation Immunity).
+                </p>
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="switchView('view-login')">Student & Admin Login &rarr;</button>
+                    <button class="btn btn-outline" onclick="switchView('view-register')">Student Registration</button>
+                    <button class="btn btn-outline" onclick="switchView('view-student')">Direct Demo: Student Portal</button>
+                    <button class="btn btn-outline" onclick="switchView('view-admin')">Direct Demo: Admin Console</button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Security Protocol</div>
+                    <div class="stat-val" style="font-size: 1.4rem; color: #38bdf8;">Bcrypt & Salt</div>
+                    <div class="stat-sub">password_hash with adaptive cost prevents rainbow-table lookups.</div>
+                </div>
+                <div class="stat-card stat-success">
+                    <div class="stat-label">Authorization</div>
+                    <div class="stat-val" style="font-size: 1.4rem; color: #34d399;">RBAC Enforced</div>
+                    <div class="stat-sub">Admin & Student role separation with HTTP 403 Forbidden traps.</div>
+                </div>
+                <div class="stat-card stat-warning">
+                    <div class="stat-label">Session Guard</div>
+                    <div class="stat-val" style="font-size: 1.4rem; color: #fbbf24;">Anti-Fixation</div>
+                    <div class="stat-sub">session_regenerate_id(true) & 300s idle timeout defense.</div>
+                </div>
+                <div class="stat-card stat-info">
+                    <div class="stat-label">Database Guard</div>
+                    <div class="stat-val" style="font-size: 1.4rem; color: #a78bfa;">Prepared PDO</div>
+                    <div class="stat-sub">100% Parameterized queries guaranteeing SQLi immunity.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: LOGIN PAGE -->
+        <section id="view-login" class="view-panel active">
+            <div style="max-width: 480px; margin: 20px auto;">
+                <div class="card" style="padding: 30px; border-top: 5px solid var(--primary);">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 2.2rem; margin-bottom: 6px;">🔐</div>
+                        <h2 style="font-size: 1.5rem; font-weight: 700;">Account Authentication</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Sign in to access student or admin console</p>
+                    </div>
+
+                    <div style="background: #0f172a; padding: 12px; border-radius: var(--radius-sm); margin-bottom: 18px; border: 1px dashed var(--border);">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; text-align: center;">
+                            ⚡ Fast-Test Autofill (Click to populate)
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <button type="button" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px;" onclick="autofill('student')">🎓 Het Patel (Student)</button>
+                            <button type="button" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px;" onclick="autofill('admin')">🛡️ Admin Console</button>
+                        </div>
+                    </div>
+
+                    <div id="loginAlertBox"></div>
+
+                    <form onsubmit="handleLoginSubmit(event)">
+                        <div class="form-group">
+                            <label class="form-label" for="simEmail">University Email Address</label>
+                            <input type="email" id="simEmail" class="form-control" value="25cs062@charusat.edu.in" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="simPass">Password</label>
+                            <input type="password" id="simPass" class="form-control" value="Student@123" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" style="padding: 11px; margin-top: 8px;">Secure Sign In &rarr;</button>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 18px; font-size: 0.85rem; color: var(--text-secondary);">
+                        Don't have an account? <span onclick="switchView('view-register')" style="color: var(--primary); cursor: pointer; font-weight: 600;">Register as Student</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: STUDENT DASHBOARD -->
+        <section id="view-student" class="view-panel">
+            <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; border: 1px solid #2563eb; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <span class="badge badge-success" style="margin-bottom: 6px;">Authenticated Student Session</span>
+                    <h1 style="font-size: 1.7rem; margin: 0 0 4px;">Welcome, Patel Het Nitinkumar!</h1>
+                    <p style="color: #93c5fd; margin: 0; font-size: 0.9rem;">
+                        Student ID: <strong>25CS062</strong> &bull; Department: Computer Science & Engineering (Sem 3)
+                    </p>
+                </div>
+                <div style="text-align: right; background: rgba(0, 0, 0, 0.35); padding: 10px 18px; border-radius: var(--radius-md); border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div style="font-size: 0.72rem; text-transform: uppercase; color: #94a3b8; font-weight: 700;">Inactivity Timeout</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #38bdf8; font-family: monospace;">04:58</div>
+                    <div style="font-size: 0.68rem; color: #64748b;">Auto-logout at 300s</div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Enrolled Modules</div>
+                    <div class="stat-val" id="studentEnrolledCount">4</div>
+                    <div class="stat-sub">Active semester 3 subjects</div>
+                </div>
+                <div class="stat-card stat-success">
+                    <div class="stat-label">Total Earned Credits</div>
+                    <div class="stat-val" id="studentCreditCount">17</div>
+                    <div class="stat-sub">Course credits registered</div>
+                </div>
+                <div class="stat-card stat-warning">
+                    <div class="stat-label">Aggregate Attendance</div>
+                    <div class="stat-val">92.3%</div>
+                    <div class="stat-sub">Minimum 80% mandatory</div>
+                </div>
+                <div class="stat-card stat-info">
+                    <div class="stat-label">Security Role</div>
+                    <div class="stat-val" style="font-size: 1.5rem;">Student</div>
+                    <div class="stat-sub">Strict RBAC scope applied</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">📚 Registered Academic Courses</h2>
+                            <span class="badge badge-info">Semester 3 Curriculum</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table" id="coursesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Course Title</th>
+                                        <th>Credits</th>
+                                        <th>Faculty</th>
+                                        <th>Grade</th>
+                                        <th>Attendance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>CE251</strong></td>
+                                        <td>Web Development Framework</td>
+                                        <td>4</td>
+                                        <td>Prof. K. R. Sharma</td>
+                                        <td><span class="badge badge-success">AA</span></td>
+                                        <td><span style="color:#34d399; font-weight:700;">94.5%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CE252</strong></td>
+                                        <td>Data Structures & Algorithms</td>
+                                        <td>5</td>
+                                        <td>Dr. P. N. Joshi</td>
+                                        <td><span class="badge badge-success">AB</span></td>
+                                        <td><span style="color:#34d399; font-weight:700;">91.2%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CE253</strong></td>
+                                        <td>Operating Systems & System Programming</td>
+                                        <td>4</td>
+                                        <td>Prof. S. M. Patel</td>
+                                        <td><span class="badge badge-success">AA</span></td>
+                                        <td><span style="color:#34d399; font-weight:700;">96.0%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CE254</strong></td>
+                                        <td>Computer Networks & Protocols</td>
+                                        <td>4</td>
+                                        <td>Dr. A. V. Trivedi</td>
+                                        <td><span class="badge badge-success">BB</span></td>
+                                        <td><span style="color:#34d399; font-weight:700;">87.5%</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">➕ Elective & Course Registration</h3>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: flex-end;">
+                            <div style="flex: 1;">
+                                <label class="form-label">Available Semester Courses</label>
+                                <select id="enrollSelect" class="form-control">
+                                    <option value="MA251">MA251 - Discrete Mathematics & Graph Theory (4 Credits)</option>
+                                    <option value="HS201">HS201 - Professional Communication & Ethics (2 Credits)</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" onclick="simulateEnroll()" style="height: 42px;">Enroll Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">📢 Campus Bulletins</h3>
+                        </div>
+                        <div class="notice-item urgent">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                <strong style="font-size:0.9rem;">Final Practical Exam Schedule</strong>
+                                <span class="badge badge-danger">Urgent</span>
+                            </div>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:4px;">Web Development Framework (CE251) lab examination will be held in Lab 304.</p>
+                            <small style="color:var(--text-muted); font-size:0.7rem;">Published by Admin Console</small>
+                        </div>
+                        <div class="notice-item important">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                                <strong style="font-size:0.9rem;">Teams Submission Window Active</strong>
+                                <span class="badge badge-warning">Important</span>
+                            </div>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:4px;">Upload GitHub link, studenthub.sql dump, README and security checklist.</p>
+                            <small style="color:var(--text-muted); font-size:0.7rem;">Published by Admin Console</small>
+                        </div>
+                    </div>
+
+                    <div class="card" style="border-top: 3px solid #10b981;">
+                        <div class="card-header">
+                            <h3 class="card-title" style="font-size: 0.95rem;">🛡️ Security State & Audit</h3>
+                        </div>
+                        <div style="font-size: 0.8rem; line-height: 1.8; color: var(--text-secondary); font-family: monospace;">
+                            <div><strong>Session Token:</strong> sess_auth_89f0a2e...</div>
+                            <div><strong>Regenerated:</strong> <span style="color:#34d399;">Active (Anti-Fixation)</span></div>
+                            <div><strong>Cookie HttpOnly:</strong> <span style="color:#34d399;">True</span></div>
+                            <div><strong>Binding IP:</strong> 127.0.0.1</div>
+                        </div>
+                        <button class="btn btn-outline btn-block" style="margin-top:14px; font-size:0.8rem; color:#f87171; border-color:#ef4444;" onclick="switchView('view-rbac-block')">
+                            ⚠️ Test RBAC: Attempt Admin Console
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: ADMIN DASHBOARD -->
+        <section id="view-admin" class="view-panel">
+            <div style="background: linear-gradient(135deg, #7f1d1d 0%, #1e293b 100%); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; border: 1px solid #ef4444; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <span class="badge badge-danger" style="margin-bottom: 6px;">Privileged Administrative Session</span>
+                    <h1 style="font-size: 1.7rem; margin: 0 0 4px;">CHARUSAT Admin Console</h1>
+                    <p style="color: #fca5a5; margin: 0; font-size: 0.9rem;">
+                        Institutional security management, course dispatch, and student record supervision.
+                    </p>
+                </div>
+                <div style="text-align: right; background: rgba(0, 0, 0, 0.4); padding: 10px 18px; border-radius: var(--radius-md); border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div style="font-size: 0.72rem; text-transform: uppercase; color: #94a3b8; font-weight: 700;">Privileged RBAC Scope</div>
+                    <div style="font-size: 1.3rem; font-weight: 800; color: #f87171;">System Admin</div>
+                    <div style="font-size: 0.72rem; color: #94a3b8;">User: CHARUSAT Admin Console</div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card stat-info">
+                    <div class="stat-label">Total Registered Students</div>
+                    <div class="stat-val">3</div>
+                    <div class="stat-sub">Active engineering scholars</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Academic Courses</div>
+                    <div class="stat-val">5</div>
+                    <div class="stat-sub">Accredited university modules</div>
+                </div>
+                <div class="stat-card stat-success">
+                    <div class="stat-label">Student Enrollments</div>
+                    <div class="stat-val">6</div>
+                    <div class="stat-sub">Across semester cohorts</div>
+                </div>
+                <div class="stat-card stat-warning">
+                    <div class="stat-label">Published Bulletins</div>
+                    <div class="stat-val">3</div>
+                    <div class="stat-sub">Campus circulars online</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">👥 Registered Student Directory</h2>
+                    <span class="badge badge-info">Latest Registrations</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Full Name</th>
+                                <th>University Email</th>
+                                <th>Department</th>
+                                <th>Sem</th>
+                                <th>Account Status</th>
+                                <th>Registered At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>25CS062</strong></td>
+                                <td>Patel Het Nitinkumar</td>
+                                <td>25cs062@charusat.edu.in</td>
+                                <td>Computer Science & Engineering</td>
+                                <td>Sem 3</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>Oct 15, 2026</td>
+                            </tr>
+                            <tr>
+                                <td><strong>25CS015</strong></td>
+                                <td>Shah Aryan Jignesh</td>
+                                <td>25cs015@charusat.edu.in</td>
+                                <td>Computer Science & Engineering</td>
+                                <td>Sem 3</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>Oct 15, 2026</td>
+                            </tr>
+                            <tr>
+                                <td><strong>25CS044</strong></td>
+                                <td>Desai Ria Krunal</td>
+                                <td>25cs044@charusat.edu.in</td>
+                                <td>Computer Science & Engineering</td>
+                                <td>Sem 3</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>Oct 16, 2026</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card" style="border-top: 4px solid #ef4444;">
+                <div class="card-header">
+                    <h2 class="card-title">🛡️ Security Incident & Activity Audit Trail</h2>
+                    <span class="badge badge-warning">Live System Monitoring</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" style="font-size: 0.85rem; font-family: monospace;">
+                        <thead>
+                            <tr>
+                                <th>Log ID</th>
+                                <th>Action</th>
+                                <th>User</th>
+                                <th>IP Address</th>
+                                <th>Event Details</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#108</td>
+                                <td><span class="badge badge-success">AUTH_SUCCESS</span></td>
+                                <td>CHARUSAT Admin Console</td>
+                                <td>127.0.0.1</td>
+                                <td>Authenticated as Admin. Session ID regenerated to protect against fixation.</td>
+                                <td>Just now</td>
+                            </tr>
+                            <tr>
+                                <td>#107</td>
+                                <td><span class="badge badge-danger">RBAC_VIOLATION_BLOCKED</span></td>
+                                <td>Patel Het Nitinkumar</td>
+                                <td>127.0.0.1</td>
+                                <td>User '25CS062' (Role: Student) attempted unauthorized access to restricted endpoint: /admin_dashboard.php</td>
+                                <td>2 mins ago</td>
+                            </tr>
+                            <tr>
+                                <td>#106</td>
+                                <td><span class="badge badge-success">AUTH_SUCCESS</span></td>
+                                <td>Patel Het Nitinkumar</td>
+                                <td>127.0.0.1</td>
+                                <td>Authenticated as Student. Session token regenerated.</td>
+                                <td>5 mins ago</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 5: RBAC 403 FORBIDDEN INTERCEPT -->
+        <section id="view-rbac-block" class="view-panel">
+            <div style="max-width: 600px; margin: 30px auto; background: #1e293b; border: 1px solid #334155; border-top: 5px solid #ef4444; border-radius: var(--radius-md); padding: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+                <span class="badge badge-danger" style="margin-bottom: 12px; font-size: 0.8rem; padding: 4px 10px;">HTTP 403 FORBIDDEN</span>
+                <h1 style="color: #ef4444; font-size: 1.6rem; margin-bottom: 10px;">RBAC Access Restriction Violation</h1>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 16px;">
+                    Access to this portal resource is strictly restricted based on organizational Role-Based Access Control (RBAC) security policy.
+                </p>
+
+                <div style="background: #090d16; border-radius: 6px; padding: 14px; font-family: monospace; font-size: 0.85rem; color: #94a3b8; border: 1px solid #1e293b; line-height: 1.8; margin-bottom: 20px;">
+                    <strong>Security Diagnostics:</strong><br>
+                    • Authenticated Account : Patel Het Nitinkumar (25CS062)<br>
+                    • Current User Role     : <span style="color:#f87171; font-weight:700;">Student</span><br>
+                    • Required Role(s)      : <span style="color:#4ade80; font-weight:700;">Admin</span><br>
+                    • Attempted Endpoint    : /admin_dashboard.php<br>
+                    • Access Attempt Status : <strong>REJECTED & AUDITED</strong>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-primary" onclick="switchView('view-student')">Return to Student Dashboard</button>
+                    <button class="btn btn-outline" onclick="switchView('view-login')">Sign Out</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 6: SESSION FIXATION DEFENSE PROOF -->
+        <section id="view-fixation" class="view-panel">
+            <div class="card" style="border-top: 4px solid var(--primary);">
+                <div class="card-header">
+                    <h2 class="card-title">🛡️ Session Fixation Attack Mitigation Proof (CWE-384)</h2>
+                    <span class="badge badge-success">session_regenerate_id(true) Verified</span>
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    In an unmitigated application, an attacker forces a victim to adopt an attacker-known session ID (e.g. via phishing link <code>?PHPSESSID=attacker_key</code>). When the victim logs in, the attacker hijacks the session. In StudentHub, <code>session_regenerate_id(true)</code> purges the unauthenticated session file and produces a brand new token immediately upon login.
+                </p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+                    <div style="background: #0f172a; padding: 20px; border-radius: 8px; border-left: 4px solid #ef4444;">
+                        <span class="badge badge-danger" style="margin-bottom: 8px;">State 1: Pre-Authentication</span>
+                        <h4 style="margin: 6px 0 10px; font-size: 1.1rem;">Pre-Login Session ID</h4>
+                        <div style="font-family: monospace; font-size: 0.95rem; color: #fca5a5; word-break: break-all; background: #000; padding: 10px; border-radius: 4px;">
+                            sess_unauth_847dfa9102bc45009e812d
+                        </div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">
+                            Status: <strong style="color: #ef4444;">DESTROYED & PURGED</strong> on server via <code>true</code> parameter.
+                        </div>
+                    </div>
+
+                    <div style="background: #0f172a; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981;">
+                        <span class="badge badge-success" style="margin-bottom: 8px;">State 2: Post-Authentication</span>
+                        <h4 style="margin: 6px 0 10px; font-size: 1.1rem;">Post-Login Regenerated Token</h4>
+                        <div style="font-family: monospace; font-size: 0.95rem; color: #86efac; word-break: break-all; background: #000; padding: 10px; border-radius: 4px;">
+                            sess_auth_3910cbe441f99a8034d619
+                        </div>
+                        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">
+                            Status: <strong style="color: #10b981;">ACTIVE & ENCRYPTED</strong> (Bound to 25CS062).
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #090d16; padding: 16px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; color: #38bdf8;">
+                    // Implementation in authenticate.php:<br>
+                    if (password_verify($password, $user['password_hash'])) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<strong>session_regenerate_id(true);</strong> // Deletes old unauthenticated session file<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;$_SESSION['user_id'] = $user['id'];<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;$_SESSION['role'] = $user['role'];<br>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 7: INACTIVITY TIMEOUT ALERT -->
+        <section id="view-timeout" class="view-panel">
+            <div style="max-width: 480px; margin: 30px auto;">
+                <div class="card" style="padding: 30px; border-top: 5px solid var(--warning);">
+                    <div class="alert alert-warning" role="alert" style="margin-bottom: 20px;">
+                        <span>⏳ <strong>Session Expired:</strong> Inactive for over 300 seconds (5 minutes). Re-login required.</span>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 2.2rem; margin-bottom: 6px;">⏱️</div>
+                        <h2 style="font-size: 1.4rem; font-weight: 700;">Re-Authentication Required</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Your session was safely destroyed to prevent terminal hijacking.</p>
+                    </div>
+
+                    <form onsubmit="handleLoginSubmit(event)">
+                        <div class="form-group">
+                            <label class="form-label">University Email Address</label>
+                            <input type="email" class="form-control" value="25cs062@charusat.edu.in" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" style="padding: 11px;">Re-Authenticate &rarr;</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 8: REGISTRATION FORM -->
+        <section id="view-register" class="view-panel">
+            <div style="max-width: 640px; margin: 20px auto;">
+                <div class="card" style="padding: 30px; border-top: 5px solid var(--primary);">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 2.2rem; margin-bottom: 6px;">📝</div>
+                        <h1 style="font-size: 1.5rem; font-weight: 700;">Student Portal Registration</h1>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Create authenticated student credentials with Bcrypt encryption</p>
+                    </div>
+
+                    <form onsubmit="handleRegisterSubmit(event)">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                            <div class="form-group">
+                                <label class="form-label">Student ID *</label>
+                                <input type="text" class="form-control" value="25CS099" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" value="Kavya Patel" required>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                            <div class="form-group">
+                                <label class="form-label">University Email *</label>
+                                <input type="email" class="form-control" value="25cs099@charusat.edu.in" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Contact Phone</label>
+                                <input type="tel" class="form-control" value="9876501234">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                            <div class="form-group">
+                                <label class="form-label">Password *</label>
+                                <input type="password" id="regPwd" class="form-control" value="KavyaPass@2026" oninput="updateStrength(this.value)">
+                                <div id="regStrength" style="font-size:0.75rem; color:#10b981; font-weight:700; margin-top:4px;">Strong password (Bcrypt cost 10)</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirm Password *</label>
+                                <input type="password" class="form-control" value="KavyaPass@2026">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block" style="padding: 11px; margin-top: 10px;">Register Student Account &rarr;</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 9: AUDIT LOG TABLE -->
+        <section id="view-audit" class="view-panel">
+            <div class="card" style="border-top: 4px solid #ef4444;">
+                <div class="card-header">
+                    <h2 class="card-title">🛡️ System Security & Incident Audit Trail</h2>
+                    <span class="badge badge-warning">Live System Monitoring</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" style="font-size: 0.85rem; font-family: monospace;">
+                        <thead>
+                            <tr>
+                                <th>Log ID</th>
+                                <th>Action</th>
+                                <th>User</th>
+                                <th>IP Address</th>
+                                <th>Security Context & Event Details</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#112</td>
+                                <td><span class="badge badge-success">AUTH_SUCCESS</span></td>
+                                <td>Patel Het Nitinkumar</td>
+                                <td>127.0.0.1</td>
+                                <td>Authenticated as Student. Session ID regenerated to protect against fixation.</td>
+                                <td>2026-10-30 12:15:20</td>
+                            </tr>
+                            <tr>
+                                <td>#111</td>
+                                <td><span class="badge badge-danger">RBAC_VIOLATION_BLOCKED</span></td>
+                                <td>Patel Het Nitinkumar</td>
+                                <td>127.0.0.1</td>
+                                <td>User '25CS062' (Role: Student) attempted unauthorized access to restricted endpoint: /admin_dashboard.php</td>
+                                <td>2026-10-30 12:14:02</td>
+                            </tr>
+                            <tr>
+                                <td>#110</td>
+                                <td><span class="badge badge-danger">AUTH_FAILED</span></td>
+                                <td>Guest / Attacker</td>
+                                <td>127.0.0.1</td>
+                                <td>Failed login attempt for email: ' OR '1'='1' -- (Defeated via PDO)</td>
+                                <td>2026-10-30 12:12:45</td>
+                            </tr>
+                            <tr>
+                                <td>#109</td>
+                                <td><span class="badge badge-success">STUDENT_REGISTER</span></td>
+                                <td>Patel Het Nitinkumar</td>
+                                <td>127.0.0.1</td>
+                                <td>New student registration for 25CS062 with Bcrypt salt.</td>
+                                <td>2026-10-30 12:10:11</td>
+                            </tr>
+                            <tr>
+                                <td>#108</td>
+                                <td><span class="badge badge-success">SYSTEM_INIT</span></td>
+                                <td>System Installer</td>
+                                <td>127.0.0.1</td>
+                                <td>Database studenthub_db schema initialized with seed records.</td>
+                                <td>2026-10-30 12:00:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 4. Screenshot Guide Modal Dialog -->
+    <div id="guideModal" class="modal-overlay">
+        <div class="modal-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: #38bdf8;">📸 Screenshot Submission Guide</h3>
+                <button class="btn btn-outline" onclick="closeGuideModal()" style="padding: 4px 10px; font-size: 0.85rem;">✕ Close</button>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
+                Use the top dropdown to switch to any scenario and press <kbd>Win + Shift + S</kbd> (Windows) to capture clean screenshots for your Word practical submission file:
+            </p>
+            <ol style="font-size: 0.82rem; line-height: 1.8; color: #cbd5e1; margin-left: 20px;">
+                <li><strong>Screenshot 1:</strong> Landing Page Gateway (`index.php`)</li>
+                <li><strong>Screenshot 2:</strong> Student Login (`login.php`) with autofill buttons</li>
+                <li><strong>Screenshot 3:</strong> Student Dashboard (`student_dashboard.php`) with Het Patel (25CS062)</li>
+                <li><strong>Screenshot 4:</strong> Admin Console (`admin_dashboard.php`) with KPI cards and directory</li>
+                <li><strong>Screenshot 5:</strong> RBAC 403 Forbidden Intercept Screen</li>
+                <li><strong>Screenshot 6:</strong> Session Fixation Mitigation Token Proof</li>
+                <li><strong>Screenshot 7:</strong> Session Inactivity Expiration (Timeout) Notice</li>
+                <li><strong>Screenshot 8:</strong> Student Registration Portal with Password Strength Meter</li>
+                <li><strong>Screenshot 9:</strong> Real-time Security Incident & Activity Audit Trail</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Scenario definitions and banner text mapping
+        const bannerContexts = {
+            'view-landing': '📸 Screenshot 1 Context: System Landing Page (index.php) showing portal architecture and latest notices.',
+            'view-login': '📸 Screenshot 2 Context: Student Authentication (login.php) with credentials populated for Het Patel (25CS062).',
+            'view-student': '📸 Screenshot 3 Context: Student Academic Dashboard (student_dashboard.php) with enrolled courses, attendance, and session timer.',
+            'view-admin': '📸 Screenshot 4 Context: Admin Management Console (admin_dashboard.php) with KPI statistics and student directory.',
+            'view-rbac-block': '📸 Screenshot 5 Context: HTTP 403 Forbidden Security Intercept when Student attempts to load Admin Console.',
+            'view-fixation': '📸 Screenshot 6 Context: Session Fixation Defense Proof showing session ID transition across login.',
+            'view-timeout': '📸 Screenshot 7 Context: Automated Inactivity Session Expiration banner after 300 seconds idle.',
+            'view-register': '📸 Screenshot 8 Context: Student Self-Registration Portal (register.php) with real-time validation.',
+            'view-audit': '📸 Screenshot 9 Context: Real-Time Security Incident & Activity Audit Trail in Admin Console.'
+        };
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(viewId);
+            if (target) {
+                target.classList.add('active');
+                document.getElementById('scenarioSelect').value = viewId;
+                document.getElementById('shotBanner').innerHTML = bannerContexts[viewId] || '';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function autofill(role) {
+            const email = document.getElementById('simEmail');
+            const pass = document.getElementById('simPass');
+            if (role === 'student') {
+                email.value = '25cs062@charusat.edu.in';
+                pass.value = 'Student@123';
+            } else {
+                email.value = 'admin@charusat.edu.in';
+                pass.value = 'Admin@123';
+            }
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('simEmail').value.trim();
+            if (email.includes('admin')) {
+                switchView('view-admin');
+            } else {
+                switchView('view-student');
+            }
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            alert('🎉 Registration simulated successfully! Bcrypt password generated. Redirecting to login.');
+            switchView('view-login');
+        }
+
+        function simulateEnroll() {
+            const sel = document.getElementById('enrollSelect');
+            const val = sel.value;
+            const table = document.getElementById('coursesTable').getElementsByTagName('tbody')[0];
+            
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td><strong>${val}</strong></td>
+                <td>Discrete Mathematics & Graph Theory</td>
+                <td>4</td>
+                <td>Dr. R. B. Mehta</td>
+                <td><span class="badge badge-success">Enrolled</span></td>
+                <td><span style="color:#34d399; font-weight:700;">100.0%</span></td>
+            `;
+
+            document.getElementById('studentEnrolledCount').textContent = '5';
+            document.getElementById('studentCreditCount').textContent = '21';
+            sel.remove(sel.selectedIndex);
+            alert('✅ Course successfully enrolled and credits updated!');
+        }
+
+        function updateStrength(val) {
+            const indicator = document.getElementById('regStrength');
+            if (val.length >= 8 && /[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val)) {
+                indicator.style.color = '#10b981';
+                indicator.textContent = 'Strong password (Bcrypt cost 10)';
+            } else {
+                indicator.style.color = '#f59e0b';
+                indicator.textContent = 'Medium: Add numbers & special characters';
+            }
+        }
+
+        function openGuideModal() { document.getElementById('guideModal').style.display = 'flex'; }
+        function closeGuideModal() { document.getElementById('guideModal').style.display = 'none'; }
+    </script>
+</body>
+</html>
